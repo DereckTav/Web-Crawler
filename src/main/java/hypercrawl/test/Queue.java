@@ -3,10 +3,14 @@ package hypercrawl.test;
 import java.util.LinkedList;
 import java.util.Set;
 
+// not thread safe fix
 public class Queue {
 
     private LinkedList<String> queue;
     
+    /**
+     * Create Queue that all spiders can access 
+     */
     public Queue() {
         queue = new LinkedList<>();
     }
@@ -21,11 +25,15 @@ public class Queue {
         queue.add(link);
     }
 
-    public void dequeue() {
-        queue.remove();
+    public String dequeue() {
+        return queue.remove();
     }
 
     public void clear() {
         queue.clear();
+    }
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
     }
 }

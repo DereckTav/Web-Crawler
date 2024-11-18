@@ -5,18 +5,18 @@ package hypercrawl.test;
  *
  */
 public class App {       
+    
+
+    // add block list
+    // and 2000 or 5000 link limit
 
     // have mother spider
-    // function that get website as input
-    // through error if invalid website
-    // add it to queue
-
     //limit 2000 links
 
-    // get all hyper links and add it to queue
-    // run bfs
+    // add update number of links searched
+    // and exra things later
 
     //return links
 
-
+    // remember clear features
 }

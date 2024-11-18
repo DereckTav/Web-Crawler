@@ -10,42 +10,42 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
-public class Linkfinder {
+public class LinkFinder {
 
     private String sourceURL;
-    private Set<String> links;
     
     /**
      * create instance of Linkfinder
      * @param sourceURL
      */
-    public Linkfinder(String sourceURL) {
+    public LinkFinder(String sourceURL) {
         this.sourceURL = sourceURL;
-        this.links = new HashSet<>();
     }
 
-    /**
-     * gets the Links from the page,
-     * and adds it to list links,
-     * ready to be returned
-     * @param pageURL
-     */
-    public void pageLinks(String pageURL) {
+     /**
+      * gets the Links from the page,
+      * and returns Set<String> of absolute strings
+      * @param pageURL
+      * @return Set<String> links
+      */
+    private Set<String> pageLinks(String pageURL) {
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch();
             Page page = browser.newPage();
             page.navigate(pageURL);
             
-            // extraxts link from page
-            List<String> links = page.locator("a").allTextContents();
+            // extracts link from page
+            List<String> relativelinks = page.locator("a").allTextContents();
+
+            Set<String> links = new HashSet<>();
 
             // resolve the relative links to absolute links
             // add absolute links to set
             try {
 
-                for (String relativeLink : links){
+                for (String relativeLink : relativelinks){
                     String relativeURL = resolveRelativeUrl(sourceURL, relativeLink);
-                    this.links.add(relativeURL);
+                    links.add(relativeURL);
                 }
 
             } catch (URISyntaxException e) {
@@ -53,18 +53,18 @@ public class Linkfinder {
             }
 
             browser.close();
+
+            return links;
         }
     }
 
     /**
      * return list of links
-     * clear links after
      * @return Set<String> links
      */
-    public Set<String> getLinks() {
-        Set<String> setOfLinks = new HashSet<>(links);
-        links.clear();
-        return setOfLinks;
+    public Set<String> getLinks(String pageURL) {
+        Set<String> links = pageLinks(pageURL);
+        return links;
     }
 
     /**
