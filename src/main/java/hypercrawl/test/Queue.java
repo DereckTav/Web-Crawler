@@ -1,18 +1,17 @@
 package hypercrawl.test;
 
-import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
-// not thread safe fix
 public class Queue {
 
-    private LinkedList<String> queue;
+    private LinkedBlockingQueue<String> queue;
     
     /**
      * Create Queue that all spiders can access 
      */
     public Queue() {
-        queue = new LinkedList<>();
+        queue = new LinkedBlockingQueue<>();
     }
 
     public void enqueueList(Set<String> links) {
@@ -26,7 +25,7 @@ public class Queue {
     }
 
     public String dequeue() {
-        return queue.remove();
+        return queue.remove();   
     }
 
     public void clear() {

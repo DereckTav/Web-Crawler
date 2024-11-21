@@ -15,6 +15,7 @@ public class Spider {
         this.crawlPage(pageURL);
     }
 
+    //add delay
     public void crawlPage(String pageURL) {
         // if first spider add page to queue
         if (queue.isEmpty()) {

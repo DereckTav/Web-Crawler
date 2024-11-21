@@ -2,12 +2,13 @@ package hypercrawl.test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-// not thread safe fix
 public class Crawled {
-
-    private Set<String> processed;
-    private Set<String> discovered;
+    
+    private final Set<String> processed;
+    private final Set<String> discovered;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * Create Crawled list that all spiders can access
@@ -18,20 +19,40 @@ public class Crawled {
     }
 
     public boolean contains(String link) {
-        return processed.contains(link) || discovered.contains(link);
+        lock.readLock().lock();
+        try {
+            return processed.contains(link) || discovered.contains(link);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public void processed(String link) {
-        discovered.remove(link);
-        processed.add(link);
+        lock.writeLock().lock();
+        try {
+            discovered.remove(link);
+            processed.add(link);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public void discovered(String link) {
-        discovered.add(link);
+        lock.writeLock().lock();
+        try {
+            discovered.add(link);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
     
     public void clear() {
-        discovered.clear();
-        processed.clear();
+        lock.writeLock().lock();
+        try{
+            discovered.clear();
+            processed.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }

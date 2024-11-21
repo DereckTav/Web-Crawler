@@ -1,12 +1,12 @@
 package hypercrawl.test;
 
 /**
- * Hello world!
- *
+ * enable use of thread in vs code
+ * 
  */
 public class App {       
     
-
+    // Apache Commons UrlValidator to ensure links are valid before processing them.
     // add block list
     // and 2000 or 5000 link limit
 
@@ -18,5 +18,6 @@ public class App {
 
     //return links
 
+    //BFS part
     // remember clear features
 }
