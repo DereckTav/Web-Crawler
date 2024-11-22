@@ -2,28 +2,32 @@ package hypercrawl.test;
 
 import java.util.Set;
 
-public class Spider {
+public class Spider implements Runnable {
 
-    private Queue queue;
-    private Crawled crawled;
-    private LinkFinder linkFinder;
+    private final Queue queue;
+    private final Crawled crawled;
+    private final LinkFinder linkFinder;
+    private String pageURL;
 
     public Spider(String pageURL, LinkFinder linkFinder, Crawled crawled, Queue queue) {
         this.queue = queue;
         this.crawled = crawled;
         this.linkFinder = linkFinder;
-        this.crawlPage(pageURL);
+        this.pageURL = pageURL;
     }
 
-    //add delay
-    public void crawlPage(String pageURL) {
-        // if first spider add page to queue
-        if (queue.isEmpty()) {
-            queue.enqueue(pageURL); 
-        }
-
+    // add delay
+    public void crawlPage() { //took away method should just get from queue right since the first thing that happens is run
+        // add if statment
         // finish when you have down the bfs part in app
         // may not need discovered and processed in crawled
-        
+
+    }
+
+    @Override
+    public void run() {
+        if(queue.isEmpty()) {
+            queue.enqueue(pageURL);
+        }
     }
 }

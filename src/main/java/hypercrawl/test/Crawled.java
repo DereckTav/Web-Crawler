@@ -6,9 +6,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Crawled {
     
-    private final Set<String> processed;
+    private final Set<String> processed; // processed list of hyperlinks to be returned
     private final Set<String> discovered;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final int size;
 
     /**
      * Create Crawled list that all spiders can access
@@ -16,6 +17,7 @@ public class Crawled {
     public Crawled() {
         processed = new HashSet<>(); 
         discovered = new HashSet<>();
+        size = 50;
     }
 
     public boolean contains(String link) {
@@ -27,9 +29,17 @@ public class Crawled {
         }
     }
 
+    public boolean isFull() {
+        return processed.size() >= 50;
+    }
+
     public void processed(String link) {
         lock.writeLock().lock();
         try {
+            if (isFull()) {
+                return;
+            }
+
             discovered.remove(link);
             processed.add(link);
         } finally {
