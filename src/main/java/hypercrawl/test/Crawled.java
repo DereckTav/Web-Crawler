@@ -30,7 +30,7 @@ public class Crawled {
     }
 
     public boolean isFull() {
-        return processed.size() >= 50;
+        return processed.size() >= size;
     }
 
     public void processed(String link) {
@@ -64,5 +64,9 @@ public class Crawled {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    public Set<String> getLinks() {
+        return processed;
     }
 }

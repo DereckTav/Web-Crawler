@@ -1,8 +1,8 @@
 package hypercrawl.test;
 
-import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,48 +15,56 @@ import org.apache.commons.validator.routines.UrlValidator;
 public class App {
     
     private static Queue queue;
-    private static LinkFinder linkFinder;
     private static Crawled crawled;
                 
     public App() {
         queue = new Queue();
-        linkFinder = new LinkFinder();
         crawled = new Crawled();
+    }
+
+    public void getHyperLinkOf(String rootURL, CountDownLatch latch) {
+        // Apache Commons UrlValidator to ensure links are valid before processing them.
+        UrlValidator urlValidator = new UrlValidator();
+
+        if(!urlValidator.isValid(rootURL)) {
+            System.out.println("invalid link");
+            return;
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+
+        Spider motherSpider = new Spider(rootURL, crawled, queue, executorService, latch);
+        executorService.submit(motherSpider);
+    }
+
+    public Set<String> returnLinks() {
+        return crawled.getLinks();
     }
     
     public static void main(String args[]) {
+        new App();
         Scanner scan = new Scanner(System.in);
 
-        System.out.println("give URL you which to get Hyperlinks for:");
-        String url = scan.nextLine();
+        System.out.print("get Hyperlinks for: ");
+        String rootURL = scan.nextLine().strip();
+
+        //https://web-scraping.dev/
 
         // Apache Commons UrlValidator to ensure links are valid before processing them.
-        String[] allowedSchemes = {"http", "https"};
-        UrlValidator urlValidator = new UrlValidator(allowedSchemes, UrlValidator.ALLOW_LOCAL_URLS);
+        UrlValidator urlValidator = new UrlValidator();
 
-        if(!urlValidator.isValid(url)) {
+        if(!urlValidator.isValid(rootURL)) {
             System.out.println("invalid link");
             return;
         }
 
         // thread process
         ExecutorService executorService = Executors.newFixedThreadPool(5);
-        Spider spider = new Spider(url, linkFinder, crawled, queue);
 
-        while (!queue.isEmpty() || !crawled.isFull()) {
-            executorService.submit(() -> spider.crawlPage());
-        }
-        
-
-        executorService.shutdown();
+        CountDownLatch latch = new CountDownLatch(5);
+        Spider motherSpider = new Spider(rootURL, crawled, queue, executorService, latch);
+        executorService.submit(motherSpider);
 
         // return proccessed in crawled
     }
-
-    // add block list
-
-    //return links
-
-    //BFS part
-    // remember clear features
 }
