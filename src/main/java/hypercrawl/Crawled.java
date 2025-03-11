@@ -16,7 +16,7 @@
  * - Use `getLinks()` to retrieve the set of processed links.
  * - Can check if the maximum number of processed links has been reached using `isFull()`.
  */
-package hypercrawl.test;
+package hypercrawl;
 
 import java.util.HashSet;
 import java.util.Set;

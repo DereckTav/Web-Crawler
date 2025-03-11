@@ -10,10 +10,9 @@
  * 
  * This class is designed to be used for web scraping or crawling purposes.
  */
-package hypercrawl.test;
+package hypercrawl;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

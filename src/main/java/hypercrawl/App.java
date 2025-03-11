@@ -25,7 +25,7 @@
  * app.getHyperLinkOf("https://example.com", new CountDownLatch(5));
  * Set<String> links = app.returnLinks();
  */
-package hypercrawl.test;
+package hypercrawl;
 
 import java.util.Scanner;
 import java.util.Set;

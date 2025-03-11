@@ -12,8 +12,9 @@
  * Usage:
  * - Simply run the main method to start the crawling process on the specified root URL.
  */
-package hypercrawl.test;
+package hypercrawl;
 
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -23,13 +24,14 @@ public class Run {
         App HyperCrawler = new App();
 
         // Define the root URL for crawling (could be taken from user input)
-        String url = "https://web-scraping.dev/";
+        // String url = "https://web-scraping.dev/";
+
+        System.out.print("get Hyperlinks for: ");
+        Scanner scanner = new Scanner(System.in);
+        String url = scanner.nextLine().strip();
 
         // CountDownLatch used to wait for all crawling tasks to finish
         CountDownLatch latch = new CountDownLatch(5);
-
-        // System.out.print("get Hyperlinks for: ");
-        // String rootURL = scan.nextLine().strip();
 
         // Start the crawling process by passing the root URL and latch to the App
         HyperCrawler.getHyperLinkOf(url, latch);

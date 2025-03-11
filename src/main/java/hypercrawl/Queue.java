@@ -12,7 +12,7 @@
  * Usage:
  * - Spiders can add discovered links to the queue and dequeue links for further crawling.
  */
-package hypercrawl.test;
+package hypercrawl;
 
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;

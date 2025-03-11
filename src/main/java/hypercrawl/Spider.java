@@ -11,7 +11,7 @@
  * - Tracks discovered and processed URLs using the Crawled object.
  * - Implements the Runnable interface to run concurrently with other spiders.
  */
-package hypercrawl.test;
+package hypercrawl;
 
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
