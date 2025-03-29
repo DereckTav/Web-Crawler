@@ -61,7 +61,7 @@ public class App {
      * @param rootURL The starting URL to crawl
      * @param latch The latch to wait for the threads to complete
      */
-    public void getHyperLinkOf(String rootURL, CountDownLatch latch) {
+    public void getHyperLinkOf(String rootURL, CountDownLatch latch, int numOfSpiders) {
         // Apache Commons UrlValidator to ensure links are valid before processing them.
         UrlValidator urlValidator = new UrlValidator();
 
@@ -72,10 +72,10 @@ public class App {
         }
 
         // Create an ExecutorService with a fixed thread pool of 5 threads for concurrent processing.
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        ExecutorService executorService = Executors.newFixedThreadPool(numOfSpiders);
 
         // Create a new Spider object that will crawl the root URL and its links.
-        Spider motherSpider = new Spider(rootURL, crawled, queue, executorService, latch);
+        Spider motherSpider = new Spider(rootURL, crawled, queue, executorService, latch, numOfSpiders);
 
         // Submit the Spider task to the ExecutorService for processing
         executorService.submit(motherSpider);
@@ -115,7 +115,7 @@ public class App {
         ExecutorService executorService = Executors.newFixedThreadPool(5);
 
         CountDownLatch latch = new CountDownLatch(5);
-        Spider motherSpider = new Spider(rootURL, crawled, queue, executorService, latch);
+        Spider motherSpider = new Spider(rootURL, crawled, queue, executorService, latch, 5);
         executorService.submit(motherSpider);
 
         // return proccessed in crawled

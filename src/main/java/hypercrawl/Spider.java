@@ -23,8 +23,9 @@ public class Spider implements Runnable {
     private final Crawled crawled;  // Keeps track of discovered and processed URLs
     private final LinkFinder linkFinder;  // Finds hyperlinks on a given page
     private final ExecutorService executorService;  // Executor service for thread management
-    private final String rootURL;  // The root URL to start crawling from
+    private String rootURL;  // The root URL to start crawling from
     private final CountDownLatch latch;  // Latch to synchronize threads
+    private int numOfSpiders;
 
     /**
      * Constructor for the Spider class.
@@ -34,13 +35,31 @@ public class Spider implements Runnable {
      * @param queue The Queue to manage URLs to crawl.
      * @param executorService The ExecutorService to handle thread execution.
      * @param latch The CountDownLatch to synchronize threads.
+     * @param numOfSpiders Number of Spiders that need to be created by the mother Spider.
      */
-    public Spider(String rootURL, Crawled crawled, Queue queue, ExecutorService executorService, CountDownLatch latch) {
+    public Spider(String rootURL, Crawled crawled, Queue queue, ExecutorService executorService, CountDownLatch latch, int numOfSpiders) {
         this.queue = queue;
         this.crawled = crawled;
         this.linkFinder = new LinkFinder();
         this.executorService = executorService;
         this.rootURL = rootURL;
+        this.latch = latch;
+        this.numOfSpiders = numOfSpiders;
+    }
+
+    /**
+     * Constructor for the Spider class.
+     *
+     * @param crawled The Crawled object to track discovered and processed URLs.
+     * @param queue The Queue to manage URLs to crawl.
+     * @param executorService The ExecutorService to handle thread execution.
+     * @param latch The CountDownLatch to synchronize threads.
+     */
+    public Spider(Crawled crawled, Queue queue, ExecutorService executorService, CountDownLatch latch) {
+        this.queue = queue;
+        this.crawled = crawled;
+        this.linkFinder = new LinkFinder();
+        this.executorService = executorService;
         this.latch = latch;
     }
 
@@ -61,7 +80,7 @@ public class Spider implements Runnable {
         }
         
         // Mark the root URL as processed (can be removed if unnecessary)
-        crawled.processed(rootURL);
+        // crawled.processed(rootURL);
     }
 
     /**
@@ -80,7 +99,7 @@ public class Spider implements Runnable {
                 }
             }
 
-            crawled.processed(pageURL);
+            // crawled.processed(pageURL);
         }
 
         // Print a message when crawling is finished
@@ -110,8 +129,8 @@ public class Spider implements Runnable {
                 intialCrawl();
                 
                 // Create and submit 4 baby spiders to crawl more pages concurrently
-                for (int thread = 0; thread < 4; thread++) {
-                    Spider babySpider = new Spider(rootURL, crawled, queue, executorService, latch);
+                for (int thread = 0; thread < numOfSpiders - 1; thread++) {
+                    Spider babySpider = new Spider(crawled, queue, executorService, latch);
                     executorService.submit(babySpider);
                 }
             }

@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Crawled {
     
-    private final Set<String> processed; // Set to store processed hyperlinks to be returned
+    // private final Set<String> processed; // Set to store processed hyperlinks to be returned
     private final Set<String> discovered; // Set to store discovered hyperlinks
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(); // Lock for thread safety
     private final int size; // Maximum size for the processed set
@@ -34,12 +34,12 @@ public class Crawled {
      * Also defines a maximum size for the processed set (default: 50).
      */
     public Crawled() {
-        processed = new HashSet<>(); 
+        // processed = new HashSet<>(); 
         discovered = new HashSet<>();
-        size = 50; // Set the maximum number of processed URLs
+        size = 200; // Set the maximum number of processed URLs
     }
 
-    /**
+        /**
      * Checks if the link has already been discovered or processed.
      * Uses a read lock to allow concurrent reading of the discovered and processed sets.
      * 
@@ -49,7 +49,7 @@ public class Crawled {
     public boolean contains(String link) {
         lock.readLock().lock(); // Acquire read lock
         try {
-            return processed.contains(link) || discovered.contains(link);
+            return discovered.contains(link);
         } finally {
             lock.readLock().unlock(); // Release read lock
         }
@@ -61,7 +61,7 @@ public class Crawled {
      * @return true if the processed set is full, false otherwise.
      */
     public boolean isFull() {
-        return processed.size() >= size;
+        return discovered.size() >= size;
     }
 
     /**
@@ -70,19 +70,19 @@ public class Crawled {
      * 
      * @param link The hyperlink to mark as processed.
      */
-    public void processed(String link) {
-        lock.writeLock().lock(); // Acquire write lock for modifying the sets
-        try {
-            if (isFull()) {
-                return; // Prevent adding more processed links if the limit is reached
-            }
+    // public void processed(String link) {
+    //     lock.writeLock().lock(); // Acquire write lock for modifying the sets
+    //     try {
+    //         if (isFull()) {
+    //             return; // Prevent adding more processed links if the limit is reached
+    //         }
 
-            discovered.remove(link); // Remove link from discovered set
-            processed.add(link); // Add link to processed set
-        } finally {
-            lock.writeLock().unlock(); // Release write lock
-        }
-    }
+    //         discovered.remove(link); // Remove link from discovered set
+    //         processed.add(link); // Add link to processed set
+    //     } finally {
+    //         lock.writeLock().unlock(); // Release write lock
+    //     }
+    // }
 
     /**
      * Marks a link as discovered, adding it to the discovered set.
@@ -107,7 +107,7 @@ public class Crawled {
 
         try{
             discovered.clear();
-            processed.clear();
+            // processed.clear();
         } finally {
             lock.writeLock().unlock(); // Release write lock
         }
@@ -119,6 +119,6 @@ public class Crawled {
      * @return The set of processed hyperlinks.
      */
     public Set<String> getLinks() {
-        return processed;
+        return discovered;
     }
 }
