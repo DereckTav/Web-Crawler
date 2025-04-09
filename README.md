@@ -105,27 +105,27 @@ Retrieves and processes valid links (absolute URLs) from a given webpage. Resolv
 
 Clone this repository to your local machine:
 
-bash
+```bash
 git clone https://github.com/yourusername/WebCrawler.git
 
 Navigate to the project directory:
-
-bash
+```
+```bash
 cd Web-Crawler
-
+```
 
 Usage
 Run the application by executing the Run class, which initializes the crawling process and waits for it to complete.
 
 Example:
-java
+```java
 Run run = new Run();
 run.main(new String[]{"https://example.com"});
-
+```
 
 Crawl links from a URL using the App class:
 
-java
+```java
 App app = new App();
 CountDownLatch latch = new CountDownLatch(5); // Set the number of threads
 app.getHyperLinkOf("https://example.com", latch);
