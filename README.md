@@ -42,11 +42,11 @@ The core class for the crawling process. It handles the crawling of hyperlinks f
 - CountDownLatch (for synchronizing threads)
 
 **Usage Example:**
-java
+```java
 App app = new App();
 app.getHyperLinkOf("https://example.com", new CountDownLatch(5));
 Set<String> links = app.returnLinks();
-
+```
 
 ### Spider Class
 Responsible for crawling and processing web pages concurrently. Each Spider instance crawls a page, discovers hyperlinks, and adds them to the queue for further crawling.
