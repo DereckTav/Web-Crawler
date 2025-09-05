@@ -15,7 +15,7 @@ abstract class AbstractLinkExtractor implements LinkExtractor {
     public AbstractLinkExtractor() {}
 
     @Override
-    public abstract Set<String> getHyperlinksFrom(String url);
+    public abstract Set<String> getLinksFrom(String url);
 
     /**
      * Extracts the base URL from a given URL (scheme and host and port if given).
@@ -72,6 +72,8 @@ abstract class AbstractLinkExtractor implements LinkExtractor {
             if (url == null || Verify.isBlank(url) || processedUrls.contains(url)) {
                 continue;
             }
+
+            url = url.trim();
 
             try {
                 if (Verify.isAbsolute(url)) { // already an absolute URL

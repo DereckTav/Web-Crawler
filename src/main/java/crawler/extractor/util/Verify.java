@@ -7,26 +7,26 @@ public class Verify {
     /**
      * Checks if the provided URL is an absolute URL (starts with "http://" or "https://").
      * 
-     * @param URL the URL to check
+     * @param url the URL to check
      * @return true if the URL is an absolute URL, false otherwise
      */
-    public static boolean isAbsolute(String URL) {
-        return URL.startsWith("http://") || URL.startsWith("https://");
+    public static boolean isAbsolute(String url) {
+        return url.startsWith("http://") || url.startsWith("https://");
     }
 
-    public static boolean isBlank(String URL) {
-        return URL.isBlank();
+    public static boolean isBlank(String url) {
+        return url.isBlank();
     }
 
     /**
      * Checks if the provided URL is valid. 
      * (notice that http doesn't count as a valid URL, because it isn't secure)
      * 
-     * @param URL the URL to check
+     * @param url the URL to check
      * @return true if the URL is valid, false otherwise
      */
-    public static boolean isValid(String URL) {
-        if (check(URL)) {
+    public static boolean isValid(String url) {
+        if (check(url)) {
             return true;
         }
 
@@ -36,15 +36,18 @@ public class Verify {
     /**
      * Performs various checks to validate a URL.
      * 
-     * @param URL the URL to check
+     * @param url the URL to check
      * @return true if the URL passes the checks, false otherwise
      */
-    private static boolean check(String URL) {
+    private static boolean check(String url) {
         // Exclude URLs with certain characteristics (e.g., anchor URLs, mailto URLs, etc.)
-        return !URL.startsWith("#")
-                && !URL.startsWith("mailto:")
-                && !URL.startsWith("http://")
-                && !URL.contains("javascript:")
-                && !URL.matches(".*\\.(jpg|jpeg|png|gif|docx|zip|mp4|avi|svg|css|js|ico)$");
+        return !url.startsWith("#")
+                && !url.startsWith("mailto:")
+                && !url.contains("javascript:")
+                && !url.matches("(?i).*\\.(jpg|jpeg|png|gif|docx|zip|mp4|avi|svg|css|js|ico)(\\?.*)?$");
+    }
+
+    public static boolean isPdf(String url) {
+        return url.matches("(?i).*\\.pdf(\\?.*)?$");
     }
 }

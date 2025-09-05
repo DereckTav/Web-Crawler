@@ -1,6 +1,6 @@
 package crawler.extractor;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 import crawler.extractor.util.Verify;
@@ -27,18 +27,14 @@ public class Extractor {
         }
     }
 
-    public static Set<String> extractURLsFrom(String URL) {
+    public static Set<String> extractURLsFrom(String url) {
+        url = url.trim();
         
-        if (Verify.isBlank(URL) || !Verify.isValid(URL)) {
-            return new HashSet<>();
+        if (Verify.isBlank(url) || !Verify.isValid(url)) {
+            return Collections.emptySet();
         }
 
-
-
-        // pass it on to extractors
-        // return 
-
-        throw new UnsupportedOperationException("Unimplemented method 'getHyperlinksFrom'");
+        return extractor.getLinksFrom(url);
     }
 
 }

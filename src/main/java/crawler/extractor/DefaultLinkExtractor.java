@@ -1,5 +1,6 @@
 package crawler.extractor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,8 @@ import crawler.extractor.util.Verify;
 
 class DefaultLinkExtractor extends AbstractLinkExtractor {
 
+    public DefaultLinkExtractor() {}
+
     // TODO create yaml
     // TODO take care of HTTPs status codes (stop crawling) to respect Robots.txt and Crawl Delay Directives
     // TODO Handling pagination (Many sites split content across multiple pages)
@@ -23,25 +26,21 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
     // TODO keyword feature (filter links based on keywords)
     // we can take this a step further and scrap the page start up a new thread to ai to validate if its relevant to the keyword
     // fix code and documentation
-    // TODO add class that is an immutable empty set
 
     @Override
-    public Set<String> getHyperlinksFrom(String url) {
-        String baseUrl = getBase(url);
+    public Set<String> getLinksFrom(String url) {
 
-        if (Verify.isBlank(url)) {
-            return new HashSet<>();
+        if (Verify.isPdf(url)) {
+            return parsePdf();
         }
 
-        //TODO figure out wether pdf or web page
-        //call methods regarding them
-        //then parse
-        
-        throw new UnsupportedOperationException("not implemented");
+        return parseWebsite(url);
     }
 
 
-    public Set<String> parseWebsite(String url, String baseUrl) {
+    public Set<String> parseWebsite(String url) {
+        String baseUrl = getBase(url);
+
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch();
 
@@ -65,11 +64,13 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
             System.err.println(e);
         }
 
-        return new HashSet<>();
+        return Collections.emptySet();
 
     }
 
     public Set<String> parsePdf() {
+        // might need another library for this 
+        // look at https://playwright.dev/java/docs/api/class-locator 
         throw new UnsupportedOperationException("unimplemented");
     }
 }
