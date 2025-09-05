@@ -1,4 +1,4 @@
-package hypercrawl.test;
+package crawler.test;
 
 import static org.junit.Assert.assertTrue;
 

@@ -10,7 +10,7 @@
  * 
  * This class is designed to be used for web scraping or crawling purposes.
  */
-package hypercrawl;
+package crawler.Old;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -21,6 +21,9 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+
+
+// review playwrights async features.
 
 public class LinkFinder {
     
@@ -43,6 +46,13 @@ public class LinkFinder {
         return links;
     }
 
+    // TODO Handling pagination (Many sites split content across multiple pages)
+    // Respecting robots.txt
+    // Managing request throttling to avoid detection
+    // TODO keyword feature (filter links based on keywords)
+    // we can take this a step further and scrap the page start up a new thread to ai to validate if its relevant to the keyword
+    // fix code and documentation
+
     /**
      * Fetches all the links from the given page URL and returns them as absolute URLs.
      * 
@@ -60,6 +70,7 @@ public class LinkFinder {
         }
 
         try (Playwright playwright = Playwright.create()) {
+            //TODO this finds clickable links but what about links that aren't clickable?
             // Launch the browser using Playwright
             Browser browser = playwright.chromium().launch();
             Browser.NewContextOptions contextOptions = new Browser.NewContextOptions() // Set the User-Agent when creating a context
