@@ -1,6 +1,5 @@
 package crawler.extractor;
 
-import java.util.Collections;
 import java.util.Set;
 
 import crawler.extractor.util.Verify;
@@ -31,7 +30,7 @@ public class Extractor {
         url = url.trim();
         
         if (Verify.isBlank(url) || !Verify.isValid(url)) {
-            return Collections.emptySet();
+            return Set.of();
         }
 
         return extractor.getLinksFrom(url);

@@ -1,7 +1,5 @@
 package crawler.extractor;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,16 +14,12 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
 
     public DefaultLinkExtractor() {}
 
-    // TODO create yaml
+    // TODO implement pdf parser
     // TODO take care of HTTPs status codes (stop crawling) to respect Robots.txt and Crawl Delay Directives
-    // TODO Handling pagination (Many sites split content across multiple pages)
     // TODO this finds clickable links but what about links that aren't clickable?
-    // TODO rotating IPs
-    // Respecting robots.txt
-    // Managing request throttling to avoid detection
+    // TODO rotating IPs to avoid detection should each time the method is ran should it ahve a diff ip
+    // TODO Respecting robots.txt
     // TODO keyword feature (filter links based on keywords)
-    // we can take this a step further and scrap the page start up a new thread to ai to validate if its relevant to the keyword
-    // fix code and documentation
 
     @Override
     public Set<String> getLinksFrom(String url) {
@@ -48,14 +42,13 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
             Page page = context.newPage();
 
             // Navigate to the page and wait for up to 10 seconds for it to load
-            //TODO should add yaml for this: timeout
             page.navigate(url, new Page.NavigateOptions().setTimeout(10000));
                                                                                             
             @SuppressWarnings("unchecked")
-            List<String> Links = (List<String>) page.locator("a")
+            List<String> links = (List<String>) page.locator("a")
                     .evaluateAll("list => list.map(element => element.href)"); 
 
-            Set<String> urls = resolveRelative(Links, baseUrl);
+            Set<String> urls = resolveRelative(links, baseUrl);
 
             browser.close();
             return urls;
@@ -64,13 +57,22 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
             System.err.println(e);
         }
 
-        return Collections.emptySet();
-
+        return Set.of();
     }
 
     public Set<String> parsePdf() {
-        // might need another library for this 
-        // look at https://playwright.dev/java/docs/api/class-locator 
+        // 1.download to disk then parse
+            // negatives use disk space
+            // would have to delet after
+            // adds overhead (because of download)
+            // would also need another library
+
+        // important idea how does pdf work in websites?
+
+        // 2. If possible to jsut instead pdf from website?
+            // can just extract text from pdf right there
+            // less overhead
+        
         throw new UnsupportedOperationException("unimplemented");
     }
 }

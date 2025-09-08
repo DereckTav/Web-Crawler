@@ -37,8 +37,9 @@ abstract class AbstractLinkExtractor implements LinkExtractor {
             } else {
                 return scheme + "://" + host + ":" + port; // Include port
             }
-        } catch (Exception e) {
+        } catch (URISyntaxException e) {
             // Return an empty string if the URI parsing fails
+            //TODO add logger
             return "";
         }
     }    
