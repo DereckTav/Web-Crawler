@@ -2,6 +2,7 @@ package crawler.extractor;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -20,15 +21,21 @@ import com.microsoft.playwright.Playwright;
 
 import crawler.extractor.util.Verify;
 
+import crawler.urls.detection.UrlDetector;
+import crawler.urls.detection.UrlDetectorOptions;
+import crawler.urls.Url;
+
 class DefaultLinkExtractor extends AbstractLinkExtractor {
 
     public DefaultLinkExtractor() {}
 
     // TODO take care of HTTPs status codes (stop crawling) to respect Robots.txt and Crawl Delay Directives
-    // TODO this finds clickable links but what about links that aren't clickable?
     // TODO rotating IPs to avoid detection should each time the method is ran should it ahve a diff ip
     // TODO Respecting robots.txt
-    // TODO keyword feature (filter links based on keywords)
+    
+    //note: solution doesn't take care of links with flags
+    //so two links could lead to same page but becuase of flags
+    //they will be in same set
 
     @Override
     public Set<String> getLinksFrom(String url) {
@@ -40,7 +47,7 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
         return parseWebsite(url);
     }
 
-
+    // NOTE: this finds clickable links and doesn't consider links in text
     public Set<String> parseWebsite(String url) {
         String baseUrl = getBase(url);
 
@@ -105,21 +112,26 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
     /*
      *Assumptions:
      * 
-     * 1. This method only searches for absolute URLs because its purpose is to extract 
-     * URLs from content that originates from PDF documents.
-     * 
-     * 2. Because this application is designed to parse research papers, which are 
-     * typically transmitted as PDFs, urls inside these papers must be absolute URLs 
-     * according to standards or best practices.
-     * 
-     * 3. Since PDFs don't have a useful base URL to resolve them, relative URLs are 
+     * notice Since PDFs don't have a useful base URL to resolve them, relative URLs are 
      * not handled. Therefore, in this context, any relative urls are deemed 
      * broken or meaningless.
      */
     private Set<String> getAbsoluteUrls(String string) {
+        UrlDetector parser = new UrlDetector(string, UrlDetectorOptions.HTML);
+        List<Url> found = parser.detect();
 
-        // regex to get absolute urls from string
-
-        return Set.of();
+        return found.stream()
+            .map(url -> url.toString())
+            .map(url -> {
+                if (!url.matches("^(https?://|http%3a//|https%3a//).*")) {
+                    if (!url.matches("^www\\..*")) {
+                        return "https://www." + url;
+                    } else {
+                        return "https://" + url;
+                    }
+                }
+                
+                return url;
+            }).collect(Collectors.toSet());
     } 
 }

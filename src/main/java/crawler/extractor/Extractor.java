@@ -1,5 +1,6 @@
 package crawler.extractor;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import crawler.extractor.util.Verify;
@@ -26,7 +27,7 @@ public class Extractor {
         }
     }
 
-    public static Set<String> extractURLsFrom(String url) {
+    public static Set<String> extractUrlsFrom(String url) {
         url = url.trim();
         
         if (Verify.isBlank(url) || !Verify.isValid(url)) {
@@ -36,4 +37,7 @@ public class Extractor {
         return extractor.getLinksFrom(url);
     }
 
+    public static HashMap<String,String> extractWithContext(String url) {
+        throw new UnsupportedOperationException("not implemented");
+    }
 }

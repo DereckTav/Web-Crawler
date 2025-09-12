@@ -12,10 +12,16 @@ import crawler.extractor.util.Verify;
 
 abstract class AbstractLinkExtractor implements LinkExtractor {
 
+    //note: solution doesn't take care of links with flags
+    //so two links could lead to same page but becuase of flags
+    //they will be in same set
+
     public AbstractLinkExtractor() {}
 
     @Override
     public abstract Set<String> getLinksFrom(String url);
+
+    //TODO replace Uri with URL
 
     /**
      * Extracts the base URL from a given URL (scheme and host and port if given).
@@ -103,6 +109,5 @@ abstract class AbstractLinkExtractor implements LinkExtractor {
 
         return processedUrls;
     }
-
 
 }
