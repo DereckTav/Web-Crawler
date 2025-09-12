@@ -1,5 +1,10 @@
 package crawler.extractor.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.tika.Tika;
+
 public class Verify {
 
     private Verify() {}
@@ -11,6 +16,7 @@ public class Verify {
      * @return true if the URL is an absolute URL, false otherwise
      */
     public static boolean isAbsolute(String url) {
+        url = url.toLowerCase();
         return url.startsWith("http://") || url.startsWith("https://");
     }
 
@@ -26,21 +32,7 @@ public class Verify {
      * @return true if the URL is valid, false otherwise
      */
     public static boolean isValid(String url) {
-        if (check(url)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Performs various checks to validate a URL.
-     * 
-     * @param url the URL to check
-     * @return true if the URL passes the checks, false otherwise
-     */
-    private static boolean check(String url) {
-        // Exclude URLs with certain characteristics (e.g., anchor URLs, mailto URLs, etc.)
+        url = url.toLowerCase();
         return !url.startsWith("#")
                 && !url.startsWith("mailto:")
                 && !url.contains("javascript:")
@@ -48,6 +40,14 @@ public class Verify {
     }
 
     public static boolean isPdf(String url) {
-        return url.matches("(?i).*\\.pdf(\\?.*)?$");
+        Tika tika = new Tika();
+        String mimeType = tika.detect(url);
+        return "application/pdf".equals(mimeType);
+    }
+
+    public static boolean isPdf(InputStream stream) throws IOException {
+        Tika tika = new Tika();
+        String mimeType = tika.detect(stream);
+        return "application/pdf".equals(mimeType);
     }
 }

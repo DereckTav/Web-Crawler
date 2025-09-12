@@ -2,6 +2,16 @@ package crawler.extractor;
 
 import java.util.List;
 import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.metadata.Metadata;
+
+import org.xml.sax.ContentHandler;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
@@ -14,7 +24,6 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
 
     public DefaultLinkExtractor() {}
 
-    // TODO implement pdf parser
     // TODO take care of HTTPs status codes (stop crawling) to respect Robots.txt and Crawl Delay Directives
     // TODO this finds clickable links but what about links that aren't clickable?
     // TODO rotating IPs to avoid detection should each time the method is ran should it ahve a diff ip
@@ -25,7 +34,7 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
     public Set<String> getLinksFrom(String url) {
 
         if (Verify.isPdf(url)) {
-            return parsePdf();
+            return parsePdf(url);
         }
 
         return parseWebsite(url);
@@ -42,11 +51,12 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
             Page page = context.newPage();
 
             // Navigate to the page and wait for up to 10 seconds for it to load
-            page.navigate(url, new Page.NavigateOptions().setTimeout(10000));
+            page.navigate(url, new Page.NavigateOptions()
+                .setTimeout(10000));
                                                                                             
             @SuppressWarnings("unchecked")
             List<String> links = (List<String>) page.locator("a")
-                    .evaluateAll("list => list.map(element => element.href)"); 
+                .evaluateAll("list => list.map(element => element.href)"); 
 
             Set<String> urls = resolveRelative(links, baseUrl);
 
@@ -60,19 +70,56 @@ class DefaultLinkExtractor extends AbstractLinkExtractor {
         return Set.of();
     }
 
-    public Set<String> parsePdf() {
-        // 1.download to disk then parse
-            // negatives use disk space
-            // would have to delet after
-            // adds overhead (because of download)
-            // would also need another library
+    public Set<String> parsePdf(String url) {
+        try {
+            URL entity = new URI(url).toURL();
+            try (InputStream input = entity.openStream()) {
 
-        // important idea how does pdf work in websites?
+                if (!Verify.isPdf(input)) {
+                    return Set.of();
+                }
 
-        // 2. If possible to jsut instead pdf from website?
-            // can just extract text from pdf right there
-            // less overhead
-        
-        throw new UnsupportedOperationException("unimplemented");
+                ContentHandler handler = new BodyContentHandler();
+                Metadata metadata = new Metadata();
+                AutoDetectParser parser = new AutoDetectParser();
+
+                parser.parse(input, handler, metadata);
+                String content = handler.toString()
+                    .replaceAll("\n|\r|\t", " ");
+
+                return getAbsoluteUrls(content);
+
+            } catch (IOException e) {
+                System.err.println(e.getStackTrace());
+                // could log it
+            }
+
+        } catch(Exception e) {
+            System.err.println(e.getStackTrace());
+            // could log it
+        }
+
+        return Set.of();
     }
+
+    /*
+     *Assumptions:
+     * 
+     * 1. This method only searches for absolute URLs because its purpose is to extract 
+     * URLs from content that originates from PDF documents.
+     * 
+     * 2. Because this application is designed to parse research papers, which are 
+     * typically transmitted as PDFs, urls inside these papers must be absolute URLs 
+     * according to standards or best practices.
+     * 
+     * 3. Since PDFs don't have a useful base URL to resolve them, relative URLs are 
+     * not handled. Therefore, in this context, any relative urls are deemed 
+     * broken or meaningless.
+     */
+    private Set<String> getAbsoluteUrls(String string) {
+
+        // regex to get absolute urls from string
+
+        return Set.of();
+    } 
 }
