@@ -9,7 +9,9 @@
  */
 
 // Modified by DereckTav (2025-09-08)
-// Changes: refactored package structure, implementation
+// Changes: refactored package structure,
+// Implementation: refactored tests from TestNG to JUnit 5
+
 package crawler.urls;
 
 import java.util.stream.Stream;

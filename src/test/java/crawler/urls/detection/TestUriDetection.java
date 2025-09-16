@@ -9,7 +9,8 @@
  */
 
 // Modified by DereckTav (2025-09-08)
-// Changes: refactored package structure, implementation
+// Changes: refactored package structure
+// Implementation: refactored tests from TestNG to JUnit 5
 // got rid of ftp test (since I don't really need them
 // also not implemented in UrlDetector as valid scheme)
 

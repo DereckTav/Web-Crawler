@@ -7,6 +7,10 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *
  */
+
+// Modified by DereckTav (2025-09-08)
+// Changes: refactored package structure
+// Implementation: refactored tests from TestNG to JUnit 5
 package crawler.urls;
 
 import java.util.stream.Stream;
