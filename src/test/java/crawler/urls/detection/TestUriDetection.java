@@ -12,6 +12,23 @@
 // Changes: refactored package structure, implementation
 // got rid of ftp test (since I don't really need them
 // also not implemented in UrlDetector as valid scheme)
+
+//testQuoteMatching doesn't work with any option bellow 5 except of course for QUOTE_MATCH 
+//and doesn't work for ALLOW_SINGLE_LEVEL_DOMAIN
+// leaving only available for application is JSON, JAVASCRIPT, XML, HTML
+
+//XML, HTML, JSON can replace JAVASCRIPT : testParseJavascriptExtended()
+//also becuase a pdf that is citing links shouldn't be in
+// JAVASCRIPT format
+
+// same for JSON : testParseJsonExtended
+// same for xml: testParseXmlExtended
+
+// best bet si HTML since it can do most of everything
+// but the other options can't do basic HTML
+
+// TRY HTML -> XML -> JSON -> JAVASCRIPT
+// order to trythings when creating test class for application
 package crawler.urls.detection;
 
 import crawler.urls.Url;
@@ -149,6 +166,7 @@ public class TestUriDetection {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.dddddddddddddddddddddddddddddddddddddddddddddddddddddd.bit.ly");
   }
 
+  // JSON, JAVASCRIPT, AND XML don't work here
   @Test
   public void testBasicHtml() {
     runTest(
@@ -163,6 +181,22 @@ public class TestUriDetection {
         UrlDetectorOptions.HTML,
         "//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*");
   }
+
+  @Test
+  public void testLongUrlWithInheritedSchemeExtended() {
+    runTest(
+        "<link rel=\"stylesheet\" href=\"//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*\" />",
+        UrlDetectorOptions.XML,
+        "//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*");
+    runTest(
+        "<link rel=\"stylesheet\" href=\"//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*\" />",
+        UrlDetectorOptions.JSON,
+        "//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*");
+    runTest(
+        "<link rel=\"stylesheet\" href=\"//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*\" />",
+        UrlDetectorOptions.JAVASCRIPT,
+        "//bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&amp;lang=en&amp;modules=ext.gadget.DRN-wizard%2CReferenceTooltips%2Ccharinsert%2Cteahouse%7Cext.wikihiero%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmw.PopUpMediaTransform%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*");
+}
 
   @Test
   public void testQuoteMatching() {
@@ -187,6 +221,21 @@ public class TestUriDetection {
         UrlDetectorOptions.BRACKET_MATCH, "www.google.com", "www.google.com", "www.google.com");
   }
 
+  // help figure out what option I want, if It works with default then it should work with other options.
+  // since those are extensions to default
+  @Test
+  public void testDefaultWithBrackets() {
+    runTest(
+        "MY url (www.google.com) is very cool. the domain [www.google.com] is popular and when written like this {www.google.com} it looks like code",
+        UrlDetectorOptions.Default, "www.google.com", "www.google.com", "www.google.com");
+    runTest(
+        "MY url <www.google.com) is very cool. the domain [www.google.com is popular and when written like this {www.google.com it looks like code",
+        UrlDetectorOptions.Default, "www.google.com", "www.google.com", "www.google.com");
+    runTest(
+        "MY url ()( www.google.com) is very cool. the domain [ www.google.com is popular and when written like this {www.google.com ] it looks like code",
+        UrlDetectorOptions.Default, "www.google.com", "www.google.com", "www.google.com");
+  }
+
   @Test
   public void testParseJson() {
     runTest("{\"url\": \"www.google.com\", \"hello\": \"world\", \"anotherUrl\":\"http://www.yahoo.com\"}",
@@ -194,14 +243,48 @@ public class TestUriDetection {
   }
 
   @Test
+  public void testParseJsonExtended() {
+    runTest("{\"url\": \"www.google.com\", \"hello\": \"world\", \"anotherUrl\":\"http://www.yahoo.com\"}",
+        UrlDetectorOptions.JAVASCRIPT, "www.google.com", "http://www.yahoo.com");
+    runTest("{\"url\": \"www.google.com\", \"hello\": \"world\", \"anotherUrl\":\"http://www.yahoo.com\"}",
+        UrlDetectorOptions.HTML, "www.google.com", "http://www.yahoo.com");
+    runTest("{\"url\": \"www.google.com\", \"hello\": \"world\", \"anotherUrl\":\"http://www.yahoo.com\"}",
+        UrlDetectorOptions.XML, "www.google.com", "http://www.yahoo.com");
+  }
+
+
+  @Test
   public void testParseJavascript() {
     runTest("var url = 'www.abc.com';\n" + "var url = \"www.def.com\";", UrlDetectorOptions.JAVASCRIPT, "www.abc.com",
+        "www.def.com");
+  }
+  
+  //XML, HTML, JSON can replace JAVASCRIPT
+  //also becuase a pdf that is citing links shouldn't be in
+  // JAVASCRIPT format
+  @Test
+  public void testParseJavascriptExtended() {
+    runTest("var url = 'www.abc.com';\n" + "var url = \"www.def.com\";", UrlDetectorOptions.XML, "www.abc.com",
+        "www.def.com");
+    runTest("var url = 'www.abc.com';\n" + "var url = \"www.def.com\";", UrlDetectorOptions.HTML, "www.abc.com",
+        "www.def.com");
+    runTest("var url = 'www.abc.com';\n" + "var url = \"www.def.com\";", UrlDetectorOptions.JSON, "www.abc.com",
         "www.def.com");
   }
 
   @Test
   public void testParseXml() {
     runTest("<url attr=\"www.def.com\">www.abc.com</url><url href=\"hello.com\" />", UrlDetectorOptions.XML,
+        "www.abc.com", "www.def.com", "hello.com");
+  }
+
+  @Test
+  public void testParseXmlExtended() {
+    runTest("<url attr=\"www.def.com\">www.abc.com</url><url href=\"hello.com\" />", UrlDetectorOptions.JSON,
+        "www.abc.com", "www.def.com", "hello.com");
+    runTest("<url attr=\"www.def.com\">www.abc.com</url><url href=\"hello.com\" />", UrlDetectorOptions.JAVASCRIPT,
+        "www.abc.com", "www.def.com", "hello.com");
+    runTest("<url attr=\"www.def.com\">www.abc.com</url><url href=\"hello.com\" />", UrlDetectorOptions.HTML,
         "www.abc.com", "www.def.com", "hello.com");
   }
 
@@ -336,10 +419,19 @@ public class TestUriDetection {
     runTest("hello http%3A//google.com", UrlDetectorOptions.Default, "http%3A//google.com");
   }
 
-  @Test
+  @Test 
   public void testIncompleteBracketSet() {
     runTest("[google.com", UrlDetectorOptions.BRACKET_MATCH, "google.com");
     runTest("lalla [google.com", UrlDetectorOptions.Default, "google.com");
+  }
+
+  // To help decide between the four options
+  @Test 
+  public void testIncompleteBracketSetExtended() {
+    runTest("lalla [google.com", UrlDetectorOptions.JSON, "google.com");
+    runTest("lalla [google.com", UrlDetectorOptions.JAVASCRIPT, "google.com");
+    runTest("lalla [google.com", UrlDetectorOptions.XML, "google.com");
+    runTest("lalla [google.com", UrlDetectorOptions.HTML, "google.com");
   }
 
   @Test

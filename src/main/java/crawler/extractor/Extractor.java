@@ -1,8 +1,11 @@
 package crawler.extractor;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
+import crawler.extractor.link.DefaultLinkExtractor;
+import crawler.extractor.link.LinkExtractor;
 import crawler.extractor.util.Verify;
 
 public class Extractor {
@@ -30,13 +33,16 @@ public class Extractor {
     public static Set<String> extractUrlsFrom(String url) {
         url = url.trim();
         
+        //TODO Check if we can remove this isValid
+
         if (Verify.isBlank(url) || !Verify.isValid(url)) {
-            return Set.of();
+            return Collections.emptySet();
         }
 
         return extractor.getLinksFrom(url);
     }
 
+    // for future implementation of ranking
     public static HashMap<String,String> extractWithContext(String url) {
         throw new UnsupportedOperationException("not implemented");
     }
