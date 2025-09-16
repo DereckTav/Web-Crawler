@@ -1,3 +1,11 @@
+#Refactoring web-crawler to
+  - work with PDFs,
+  - respecting robots.txt,
+  - rank links,
+  - accept keywords, maybe description,
+  - and ensuring that it is async and multithreaded.
+
+<!--
 # WebCrawler
 
 WebCrawler is a multi-threaded web crawler that efficiently discovers and processes hyperlinks from a given root URL. The crawler is implemented using Java and leverages Playwright for web scraping, Apache Commons Validator for URL validation, and various concurrency techniques to improve the crawling speed and efficiency.
@@ -131,3 +139,4 @@ CountDownLatch latch = new CountDownLatch(5); // Set the number of threads
 app.getHyperLinkOf("https://example.com", latch);
 Set<String> links = app.returnLinks();
 System.out.println(links)
+-->
