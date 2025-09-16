@@ -1,8 +1,8 @@
-package crawler.extractor;
+package crawler.extractor.link;
 
 import java.util.Set;
 
-interface LinkExtractor {
+public interface LinkExtractor {
     Set<String> getLinksFrom(String url);
 }
 
