@@ -1,42 +1,86 @@
 package crawler.extractor.web.robots;
 
+import crawler.extractor.exceptions.RobotsTxtUnavailableException;
 import crawler.http.Client;
 
+import java.io.InputStream;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
 // TODO take care of HTTPs status codes (stop crawling) to respect Robots.txt and Crawl Delay Directives
         // create rule to stop crawling site for ... time
         // or edit rules in cache
         // if rule not in cache make new rule
 
-// fetching logic
-
+// class that will cache the rules
+// rules will be created in this class
+// class will setup connection with domen/robots.txt
 
 public class RobotsFetcher {
 
     private static final HttpClient client = Client.INSTANCE.getHttpClient();
 
+    //TODO datastructure to keep track of retries for each domain
+    //make sure to delete after
+
     private RobotsFetcher() {};
+ 
+    public static RobotsRules fetch(String domain) throws RobotsTxtUnavailableException{
+        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(domain + "/robots.txt"))
+                                .timeout(Duration.ofSeconds(5))
+                                .GET()
+                                .build();
 
-    public static RobotsRules fetch(String domain) {
-        
-        return RobotsRules.of();
+        try {
+            HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
+
+            int statusCode = response.statusCode();
+            
+            switch (statusCode) {
+                case 200:
+                    try (InputStream robotsTxt = response.body()) {
+                        return RobotsRules.of(robotsTxt);
+                    }
+                case 404:
+                    return RobotsRules.of();
+                default:
+                    //TODO log it
+                    return RobotsRules.DISSALOW_ALL;
+            }
+
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RobotsTxtUnavailableException("Failed to retrieve robots.txt for " + domain + e);
+            // due to timeout cancelations or timeout
+            // consider retrying later (give a max of 3 retries)
+                // make datastructure to hold retry counts
+                    //log if after 3 retries it doesn't work
+                        // increase wait time for retires exponentially
+                            //in this case update cacheruels for that domain
+        } catch (Exception e) {
+            throw new RobotsTxtUnavailableException("Failed to retrieve robots.txt for " + domain + e);
+            //log because this could be due to 300 redirects (or sum niche status code).
+                    /* if so : Check the status code of the response.
+                     * If the code indicates a redirect, grab the new URI from the response headers.
+                     * If the new URI is relative then resolve it against the request URI.
+                     * Send a new request.
+                     */
+
+
+            // If the request times out or the site is down: treat it as empty file (no disallows). (preferably in switch case!) 
+            // if site is down get rid of return that (let it be known that site is down ( given that site is down try again later (try to get the robots again later)))
+        }
+
+        //questions what if connection timesout?
+        //what would robotstxtunavailableException intail for domains
+        //if httpclient that send gives interrupeted exception or io exception does that mean i should try later
     };
-
-    // class that will cache the rules
-    // rules will be created in this class
-    // class will setup connection with domen/robots.txt
-    // interpret http response
-        // response == 200 robots.txt exists
-        // response == 404 not found doesn't exists “no rules to worry about.” (However, it’s still good to crawl responsibly even if there’s no robots.txt.)
-        //response == 403 do not crawl
-        // response == 301 a site might redirect the robots.txt URL (301/302 redirect). If so, follow the redirect (most HTTP clients do this automatically) to get the content.
-        // If the request times out or the site is down: treat it as empty file. if site is down get rid of return that (let it be known that site is down)
-        // give rules for given code 
-    // robots usually utf-8 txt 
-
-
-    //method getRobotFrome(String Domain)
 }
 
 

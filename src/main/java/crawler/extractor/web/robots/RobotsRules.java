@@ -1,20 +1,18 @@
 package crawler.extractor.web.robots;
 
-import java.util.function.Supplier;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
-//TODO make util function so that we can compare link to robotsrules
+//This class should be immutable by default
+// for creating test cases use : https://scrape.do/blog/robots-txt/
+//robots.txt speciifes crawldelay
+// if none then ... (1 sec delay) (maybe get rid of parralel parsing rule)
+
 
 public class RobotsRules {
-    //This class should be immutable by default
-
-    // for creating test cases use : https://scrape.do/blog/robots-txt/
-
-    //robots.txt speciifes crawldelay
-    // if none then ... (1 sec delay) (maybe get rid of parralel parsing rule)
-    
-    // http request for robots.txt is done here
-    // use supplier to make rules. if its blank it won't make it if it isnt' it will.
-
     // metadate of rules
         // allowed : bool
         // disallowed : bool
@@ -31,19 +29,41 @@ public class RobotsRules {
         //don't need to generate eveyrthing allowed because it should interpret what to do
         // if disallowed blank or none go for everything
 
+
+    //TODO implement this with InputStreams
+    
+    //what is sitemap?
+    // any robots not utf-8 ignore return rule that indicates to ignore domain
+
+    private Optional<String[]> dissallowed; // basically if everything is allowed no reason to have dissallowed
+    
+    private int crawlDelay;
+
     private RobotsRules() {}
 
-    private static final RobotsRules TO_ROBOTS_RULES = 
+    private static final RobotsRules DEFAULT_RULES = 
         RobotsRules.of(
             "" //TODO replace with a supplier // also replace empty string with default params for RobotsRules
         );
 
+    public static final RobotsRules DISSALOW_ALL = 
+        RobotsRules.of(
+            "" //make so can't crawl // basically disallow: /
+        );
+
+    public static final RobotsRules RETRY = 
+        RobotsRules.of(
+            "" //make so has default crawl delay, and delay can increase exp
+        );
+        // This should have a method
+        // increase crawl time exp if instance of RETRY
+
     public static RobotsRules of() {
-        return TO_ROBOTS_RULES;
+        return DEFAULT_RULES;
     }
 
-    public static RobotsRules of(Supplier<String> robotsTxtContent) {
-        return parse(robotsTxtContent.get());
+    public static RobotsRules of(InputStream robotsTxtContent) {
+        return parse(robotsTxtContent);
     }
 
     public static RobotsRules of(String robotsTxtContent) {
@@ -52,10 +72,29 @@ public class RobotsRules {
         return parse(robotsTxtContent);
     }   
 
-    public static RobotsRules parse(String robotsTxt) {
+    public static RobotsRules parse(InputStream robotsTxtContent) {
+        HashMap<String, List<String>> connection = new HashMap<>();
+
+        List<String> disallow = new ArrayList<>();
+        List<String> allow = new ArrayList();
 
         // find approriate user agent
         // if cralwer delay is empty?
+
+        return new RobotsRules();
+    }
+
+    // Builder would make this easier
+
+
+
+    public static RobotsRules parse(String robotsTxtContent) {
+
+        // find approriate user agent
+        // if cralwer delay is empty?
+
+        // this is in the case you have a string
+        // then you would parse the whole thing set values for robots and return it
 
         return new RobotsRules();
     }
